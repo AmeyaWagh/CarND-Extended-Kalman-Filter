@@ -24,3 +24,10 @@ endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 add_executable(ExtendedKF ${sources})
 
 target_link_libraries(ExtendedKF z ssl uv uWS)
+
+
+#----------------------------------------------#
+# MAKE OTHER FILES VISIBLE
+
+FILE(GLOB_RECURSE LibFiles "src/*.h")
+add_custom_target(headers SOURCES ${LibFiles})
