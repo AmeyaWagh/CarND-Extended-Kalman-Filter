@@ -10,8 +10,10 @@ KalmanFilter::KalmanFilter() {}
 
 KalmanFilter::~KalmanFilter() {}
 
-void KalmanFilter::Init(VectorXd &x_in, MatrixXd &P_in, MatrixXd &F_in,
-                        MatrixXd &H_in, MatrixXd &R_in, MatrixXd &Q_in) {
+void
+KalmanFilter::Init(VectorXd &x_in, MatrixXd &P_in, MatrixXd &F_in,
+                   MatrixXd &H_in, MatrixXd &R_in, MatrixXd &Q_in)
+{
   x_ = x_in;
   P_ = P_in;
   F_ = F_in;
@@ -20,39 +22,35 @@ void KalmanFilter::Init(VectorXd &x_in, MatrixXd &P_in, MatrixXd &F_in,
   Q_ = Q_in;
 }
 
-void KalmanFilter::Predict() {
-  /**
-  TODO:
-    * predict the state
-  */
+void
+KalmanFilter::Predict()
+{
+
    x_ = F_*x_;
-   P_ = F_*P_*F_.transpose()+Q_;
+   P_ = F_*P_*(F_.transpose())+Q_;
 
 }
 
-void KalmanFilter::Update(const VectorXd &z) {
-  /**
-  TODO:
-    * update the state by using Kalman Filter equations
-  */
+void KalmanFilter::Update(const VectorXd &z)
+{
 
    // Calculate error
     Eigen::VectorXd y = z - (H_*x_);
 
     // Update Kalman filter
-    Eigen::MatrixXd S = H_*P_*H_.transpose()+R_;
-    Eigen::MatrixXd K = P_*H_.transpose()*S.inverse();
+    MatrixXd Ht = H_.transpose();
+    Eigen::MatrixXd S = H_*P_*Ht+R_;
+    MatrixXd Si = S.inverse();
+    Eigen::MatrixXd K = P_*Ht*Si;
 
     //estimate
     x_ = x_ + (K*y);
     P_ -= K*H_*P_;
 }
 
-void KalmanFilter::UpdateEKF(const VectorXd &z) {
-  /**
-  TODO:
-    * update the state by using Extended Kalman Filter equations
-  */
+void KalmanFilter::UpdateEKF(const VectorXd &z)
+{
+
     double rho     = sqrt(x_(0)*x_(0)+x_(1)*x_(1));
     double theta   = atan2(x_(1),x_(0));
     double rho_dot = (x_(0)*x_(2)+x_(1)*x_(3))/rho;
@@ -66,8 +64,10 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
     y(1) = atan2(sin(y(1)),cos(y(1)));
 
     // Update Kalman filter
-    Eigen::MatrixXd S = H_*P_*H_.transpose()+R_;
-    Eigen::MatrixXd K = P_*H_.transpose()*S.inverse();
+    MatrixXd Ht = H_.transpose();
+    Eigen::MatrixXd S = H_*P_*Ht+R_;
+    MatrixXd Si = S.inverse();
+    Eigen::MatrixXd K = P_*Ht*Si;
 
     //estimate
     x_ = x_ + (K*y);

@@ -41,6 +41,12 @@ public:
    * @brief uodates process covariance matrix Q_
    */
   void updateProcessCovarianceMat();
+
+  /**
+   * @brief convert polar to cartesian
+   */
+  void polarToCartesian(const MeasurementPackage &measurement_pack);
+
   /**
   * Kalman Filter update and prediction math lives in here.
   */
