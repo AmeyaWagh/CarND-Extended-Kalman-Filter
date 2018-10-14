@@ -78,8 +78,8 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 
     cout << "EKF: " << endl;
     // first measurement    
-    ekf_.x_ = VectorXd(4);
-    ekf_.x_ << 1, 1, 1, 1;
+//    ekf_.x_ = VectorXd(4);
+//    ekf_.x_ << 1, 1, 1, 1;
     ekf_.P_ = P_;
 
     // initialize previous time
@@ -146,14 +146,16 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
   cout << "P_ = " << ekf_.P_ << endl;
 }
 
-void FusionEKF::updateTime(const MeasurementPackage &measurement_pack)
+void
+FusionEKF::updateTime(const MeasurementPackage &measurement_pack)
 {
     dt = measurement_pack.timestamp_ - previous_timestamp_;
-    dt /= 1000000.0f;
+    dt /= 1000000.0;
     previous_timestamp_ = measurement_pack.timestamp_;
 }
 
-void FusionEKF::updateStateTransitionMat()
+void
+FusionEKF::updateStateTransitionMat()
 {
     ekf_.F_ = Eigen::MatrixXd(4,4);
     ekf_.F_ <<    1,0,dt,0,
@@ -162,7 +164,8 @@ void FusionEKF::updateStateTransitionMat()
                   0,0,0, 1;
 }
 
-void FusionEKF::updateProcessCovarianceMat()
+void
+FusionEKF::updateProcessCovarianceMat()
 {
 
     float dt_2 = dt * dt;       //  dt^2
