@@ -78,8 +78,6 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 
     cout << "EKF: " << endl;
     // first measurement    
-//    ekf_.x_ = VectorXd(4);
-//    ekf_.x_ << 1, 1, 1, 1;
     ekf_.P_ = P_;
 
     // initialize previous time
@@ -87,7 +85,6 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
             measurement_pack.sensor_type_ == MeasurementPackage::LASER)
       {
           previous_timestamp_ = measurement_pack.timestamp_;
-          // done initializing, no need to predict or update
           is_initialized_ = true;
       }
 
@@ -99,12 +96,9 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER)
       {
 
-          // double x = measurement_pack.raw_measurements_[0];
-          // double y = measurement_pack.raw_measurements_[1];
-          // double v_x = 0;
-          // double v_y = 0;
-          // ekf_.x_ << x,y,v_x,v_y;
-          ekf_.x_ << measurement_pack.raw_measurements_[0], measurement_pack.raw_measurements_[1], 0, 0; 
+          ekf_.x_ << measurement_pack.raw_measurements_[0],
+                  measurement_pack.raw_measurements_[1],
+                  0, 0;
       }
 
     return;
@@ -133,7 +127,8 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
       ekf_.H_ = tools.CalculateJacobian(ekf_.x_);
       ekf_.R_ = R_radar_;
       ekf_.UpdateEKF(measurement_pack.raw_measurements_);
-  } else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER)
+  }
+  else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER)
   {
     // Laser updates
       ekf_.H_ = H_laser_;
@@ -168,30 +163,31 @@ void
 FusionEKF::updateProcessCovarianceMat()
 {
 
-    float dt_2 = dt * dt;       //  dt^2
-    float dt_3 = dt_2 * dt;     //  dt^3
-    float dt_4 = dt_3 * dt;     //  dt^4
+    const float dt_2    = dt * dt;
+    const float dt_3    = dt_2 * dt;
+    const float dt_4    = dt_3 * dt;
 
-    float dt_4by4 = dt_4 / 4;    //  dt^4/4
-    float dt_3by2 = dt_3 / 2;    //  dt^3/2
+    const float dt_4by4 = dt_4 / 4;
+    const float dt_3by2 = dt_3 / 2;
 
     ekf_.Q_ = MatrixXd(4, 4);
     ekf_.Q_ << dt_4by4 * noise_ax,   0,                  dt_3by2 * noise_ax,  0,
-               0,                   dt_4by4 * noise_ay,  0,                  dt_3by2 * noise_ay,
-               dt_3by2 * noise_ax,   0,                  dt_2 * noise_ax,    0,
-               0,                   dt_3by2 * noise_ay,  0,                  dt_2 * noise_ay;
+               0,                    dt_4by4 * noise_ay, 0,                   dt_3by2 * noise_ay,
+               dt_3by2 * noise_ax,   0,                  dt_2 * noise_ax,     0,
+               0,                    dt_3by2 * noise_ay, 0,                   dt_2 * noise_ay;
 }
 
 void
 FusionEKF::polarToCartesian(const MeasurementPackage &measurement_pack)
 {
-    double rho       = measurement_pack.raw_measurements_[0];
-    double phi       = measurement_pack.raw_measurements_[1];
-    double rho_dot   = measurement_pack.raw_measurements_[2];
+    const double rho        = measurement_pack.raw_measurements_[0];
+    const double phi        = measurement_pack.raw_measurements_[1];
+    const double rho_dot    = measurement_pack.raw_measurements_[2];
 
-    double x    = rho*cos(phi);
-    double y    = rho*sin(phi);
-    double v_x  = rho_dot*cos(phi);
-    double v_y  = rho_dot*sin(phi);
+    const double x          = rho*cos(phi);
+    const double y          = rho*sin(phi);
+    const double v_x        = rho_dot*cos(phi);
+    const double v_y        = rho_dot*sin(phi);
+
     ekf_.x_ << x,y,v_x,v_y;
 }

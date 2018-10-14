@@ -34,10 +34,8 @@ int main()
 {
   uWS::Hub h;
 
-  std::cout << "in main" << std::endl;
   // Create a Kalman Filter instance
   FusionEKF fusionEKF;
-  std::cout << "created EKF" << std::endl;
 
   // used to compute the RMSE later
   Tools tools;

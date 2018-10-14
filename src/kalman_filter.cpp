@@ -38,15 +38,7 @@ void KalmanFilter::Update(const VectorXd &z)
    // Calculate error
     Eigen::VectorXd y = z - ( H_ * x_ );
 
-    // Update Kalman filter
-    MatrixXd Ht = H_.transpose();
-    MatrixXd S  = H_*P_*Ht + R_;
-    MatrixXd Si = S.inverse();
-    MatrixXd K  = P_ * Ht * Si;
-
-    // estimate
-    x_ = x_ + ( K * y );
-    P_ -= K * H_ * P_;
+    updateFilter(y);
 }
 
 void KalmanFilter::UpdateEKF(const VectorXd &z)
@@ -64,6 +56,13 @@ void KalmanFilter::UpdateEKF(const VectorXd &z)
     // normalize phi
     y(1) = atan2(sin(y(1)), cos(y(1)));
 
+    updateFilter(y);
+
+}
+
+void
+KalmanFilter::updateFilter(Eigen::VectorXd &y)
+{
     // Update Kalman filter
     MatrixXd Ht = H_.transpose();
     MatrixXd S  = H_ * P_ * Ht + R_;
@@ -73,5 +72,4 @@ void KalmanFilter::UpdateEKF(const VectorXd &z)
     //estimate
     x_ = x_ + ( K * y );
     P_ -= K * H_ * P_;
-
 }
